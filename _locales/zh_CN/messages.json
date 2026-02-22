@@ -1,0 +1,8 @@
+{
+  "appName": {
+    "message": "ChatShot - AI 对话截图"
+  },
+  "appDescription": {
+    "message": "一键截图 ChatGPT、Claude、豆包等 AI 对话，自动复制到剪贴板，轻松分享给微信/飞书/钉钉好友。"
+  }
+}

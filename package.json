@@ -1,0 +1,22 @@
+{
+  "name": "ai-chat-screenshot",
+  "version": "1.0.0",
+  "description": "One-click screenshot of AI chatbot conversations for easy sharing",
+  "private": true,
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.25",
+    "@types/chrome": "^0.1.37",
+    "canvas": "^3.2.1",
+    "html2canvas": "^1.4.1",
+    "typescript": "^5.4.0",
+    "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1"
+  }
+}

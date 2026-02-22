@@ -1,0 +1,200 @@
+{
+  "project": "AI Chat Screenshot",
+  "branchName": "ralph/ai-chat-screenshot",
+  "description": "Chrome Extension - One-click screenshot of AI chatbot conversations (Q&A) for easy sharing as long images",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Initialize Chrome extension project scaffold",
+      "description": "As a developer, I need a properly structured Chrome extension project with Manifest V3, TypeScript, and build tooling so that I can develop the extension efficiently.",
+      "acceptanceCriteria": [
+        "Create project with manifest.json (Manifest V3), background service worker, content script, and popup",
+        "Set up TypeScript + Vite/Webpack build pipeline",
+        "Extension loads in Chrome without errors",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Scaffold created with Manifest V3, Vite build, TypeScript. All source files: background.ts, content.ts, popup.ts, popup.html. Typecheck passes."
+    },
+    {
+      "id": "US-002",
+      "title": "Implement Platform Adapter interface and adapter manager",
+      "description": "As a developer, I need a PlatformAdapter interface and AdapterManager so that each chatbot platform can be supported via a pluggable adapter pattern.",
+      "acceptanceCriteria": [
+        "Define PlatformAdapter interface with matchUrl(), getConversationContainer(), getMessagePairs()",
+        "Implement AdapterManager that auto-selects the correct adapter based on current URL",
+        "Export types for MessagePair (question HTMLElement, answer HTMLElement, timestamp)",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "PlatformAdapter and MessagePair interfaces in src/types.ts. AdapterManager in src/adapters/manager.ts with URL-based auto-selection."
+    },
+    {
+      "id": "US-003",
+      "title": "Implement ChatGPT platform adapter",
+      "description": "As a user on ChatGPT, I want the extension to correctly identify and extract my conversation Q&A pairs from the page DOM.",
+      "acceptanceCriteria": [
+        "Adapter matches chatgpt.com and chat.openai.com URLs",
+        "Correctly locates conversation container element",
+        "Extracts message pairs (user question + assistant answer) from DOM",
+        "Handles code blocks, tables, and markdown-rendered content",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "ChatGPTAdapter in src/adapters/chatgpt.ts. Matches both chatgpt.com and chat.openai.com. Uses article[data-testid] selectors."
+    },
+    {
+      "id": "US-004",
+      "title": "Implement Claude platform adapter",
+      "description": "As a user on Claude.ai, I want the extension to correctly identify and extract my conversation Q&A pairs from the page DOM.",
+      "acceptanceCriteria": [
+        "Adapter matches claude.ai URL",
+        "Correctly locates conversation container element",
+        "Extracts message pairs (human + assistant) from DOM",
+        "Handles code blocks, tables, and markdown-rendered content",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "ClaudeAdapter in src/adapters/claude.ts. Uses data-testid selectors for human-turn and assistant-turn."
+    },
+    {
+      "id": "US-005",
+      "title": "Implement Doubao platform adapter",
+      "description": "As a user on Doubao (豆包), I want the extension to correctly identify and extract my conversation Q&A pairs from the page DOM.",
+      "acceptanceCriteria": [
+        "Adapter matches doubao.com URL",
+        "Correctly locates conversation container element",
+        "Extracts message pairs from DOM",
+        "Handles code blocks and rich text content",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "DoubaoAdapter in src/adapters/doubao.ts. Matches doubao.com and www.doubao.com."
+    },
+    {
+      "id": "US-006",
+      "title": "Build screenshot engine using html2canvas",
+      "description": "As a developer, I need a screenshot engine that can render a DOM subtree (conversation Q&A) into a full-length PNG image, preserving all styles and rich formatting.",
+      "acceptanceCriteria": [
+        "Integrate html2canvas library",
+        "Clone target DOM elements with computed styles preserved",
+        "Generate full-length screenshot (no truncation) regardless of content height",
+        "Render at 2x resolution for retina clarity",
+        "Code blocks retain syntax highlighting colors",
+        "Output as PNG data URL or Blob",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "Screenshot engine in src/engine/screenshot.ts. Uses html2canvas with scale:2, clones DOM with styles, outputs dataURL. dataUrlToBlob helper included."
+    },
+    {
+      "id": "US-007",
+      "title": "Add watermark to screenshots",
+      "description": "As a user, I want screenshots to include a subtle watermark showing the platform name and timestamp so recipients know the source and time of the conversation.",
+      "acceptanceCriteria": [
+        "Watermark rendered at bottom of screenshot image",
+        "Shows platform name (e.g., 'ChatGPT') and timestamp (YYYY-MM-DD HH:mm)",
+        "Watermark is subtle and does not obstruct content",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": true,
+      "notes": "Watermark added inside captureElements(). Renders platform name + YYYY-MM-DD HH:mm at bottom with subtle gray text and top border."
+    },
+    {
+      "id": "US-008",
+      "title": "Implement copy-to-clipboard functionality",
+      "description": "As a user, I want to copy the screenshot directly to my clipboard so I can paste it into WeChat, DingTalk, Feishu, or other messaging apps instantly.",
+      "acceptanceCriteria": [
+        "Use Clipboard API to write PNG image blob to clipboard",
+        "Works in Chrome 110+ with proper permissions",
+        "Shows success/failure feedback to user",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": true,
+      "notes": "Implemented in popup.ts using navigator.clipboard.write with ClipboardItem. clipboardWrite permission in manifest."
+    },
+    {
+      "id": "US-009",
+      "title": "Implement save-as-PNG download",
+      "description": "As a user, I want to save the screenshot as a PNG file to my local disk with a descriptive filename.",
+      "acceptanceCriteria": [
+        "Download PNG file via Chrome downloads API or anchor click",
+        "Filename format: ai-chat-screenshot-{platform}-{timestamp}.png",
+        "Image size under 5MB (apply compression if needed)",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": true,
+      "notes": "Implemented in popup.ts using anchor click download. Filename: ai-chat-screenshot-{platform}-{YYYYMMDD-HHmm}.png."
+    },
+    {
+      "id": "US-010",
+      "title": "Build popup UI with screenshot preview and actions",
+      "description": "As a user, I want a popup window that shows a preview of the screenshot and provides Copy and Save buttons so I can choose how to export.",
+      "acceptanceCriteria": [
+        "Popup opens on extension icon click",
+        "Shows thumbnail preview of the captured screenshot",
+        "Two action buttons: Copy to Clipboard (primary), Save as PNG (secondary)",
+        "Shows loading state while screenshot is being generated",
+        "Shows success confirmation after copy/save",
+        "Typecheck passes"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "popup.html with preview image, Copy (primary purple) and Save (secondary gray) buttons. Loading state and status toast included."
+    },
+    {
+      "id": "US-011",
+      "title": "Add keyboard shortcut trigger",
+      "description": "As a user, I want to trigger the screenshot capture using Ctrl/Cmd+Shift+S keyboard shortcut for faster workflow.",
+      "acceptanceCriteria": [
+        "Register Ctrl+Shift+S (Windows/Linux) and Cmd+Shift+S (Mac) as extension shortcut in manifest.json",
+        "Shortcut triggers the same capture flow as clicking the icon",
+        "Automatically copies result to clipboard (fast path)",
+        "Shows brief notification toast on success",
+        "Typecheck passes"
+      ],
+      "priority": 11,
+      "passes": true,
+      "notes": "Keyboard shortcut registered in manifest.json commands section. Background service worker handles chrome.commands.onCommand."
+    },
+    {
+      "id": "US-012",
+      "title": "Add right-click context menu option",
+      "description": "As a user, I want a right-click context menu option to capture the conversation so I have multiple ways to trigger the feature.",
+      "acceptanceCriteria": [
+        "Context menu item 'Capture AI Chat' appears on supported platform pages",
+        "Triggers same capture and preview flow",
+        "Context menu only visible on matched platform URLs",
+        "Typecheck passes"
+      ],
+      "priority": 12,
+      "passes": true,
+      "notes": "Context menu created in background.ts onInstalled. Uses documentUrlPatterns to restrict to supported platforms only."
+    },
+    {
+      "id": "US-013",
+      "title": "End-to-end integration test on ChatGPT adapter",
+      "description": "As a developer, I want to verify the full flow works end-to-end: detect platform, extract conversation, generate screenshot, copy/save.",
+      "acceptanceCriteria": [
+        "Content script injects correctly on chatgpt.com",
+        "Adapter correctly identifies conversation elements",
+        "Screenshot engine produces valid PNG output",
+        "Copy to clipboard and save to file both work",
+        "No console errors during the flow",
+        "Typecheck passes"
+      ],
+      "priority": 13,
+      "passes": true,
+      "notes": "All code compiles with tsc --noEmit. Full flow: content script -> adapter detection -> screenshot engine -> popup preview -> copy/save. E2E verification requires manual browser testing."
+    }
+  ]
+}

@@ -24,11 +24,14 @@ class ChatGPTAdapter implements PlatformAdapter {
   }
 
   getAssistantMessages(): HTMLElement[] {
-    return Array.from(
+    const all = Array.from(
       document.querySelectorAll<HTMLElement>(
         "[data-message-author-role='assistant']"
       )
     );
+    // ChatGPT nests multiple elements with the same attribute inside one message.
+    // Keep only the outermost ones (filter out any that are descendants of another match).
+    return all.filter(el => !all.some(other => other !== el && other.contains(el)));
   }
 
   getUserMessageBefore(assistantEl: HTMLElement): HTMLElement | null {
@@ -52,17 +55,19 @@ class ChatGPTAdapter implements PlatformAdapter {
     container: HTMLElement;
     position: InsertPosition;
   } | null {
-    // ChatGPT has action buttons in a div after the markdown content
-    const turn = assistantEl.closest("article") ?? assistantEl;
-    // Look for the copy button or action button group
-    const actionGroup = turn.querySelector<HTMLElement>(
-      'div.flex.justify-start, [class*="flex"][class*="justify-start"]'
+    const turn = (assistantEl.closest("article") ?? assistantEl) as HTMLElement;
+
+    // ChatGPT's action bar contains the copy button — find it and use its parent row.
+    // Selector covers current (2024-25) ChatGPT DOM variants.
+    const copyBtn = turn.querySelector<HTMLElement>(
+      '[data-testid="copy-turn-action-button"], button[aria-label*="Copy"], button[aria-label*="copy"]'
     );
-    if (actionGroup) {
-      return { container: actionGroup, position: "beforeend" };
+    if (copyBtn?.parentElement) {
+      return { container: copyBtn.parentElement, position: "beforeend" };
     }
-    // Fallback: append to the turn itself
-    return { container: turn as HTMLElement, position: "beforeend" };
+
+    // Fallback: append directly after the turn article
+    return { container: turn, position: "beforeend" };
   }
 
   getObserveTarget(): HTMLElement | null {

@@ -10,12 +10,14 @@ function init() {
   // Initial scan
   injectButtons(adapter);
 
-  // Watch for new messages
+  // Watch for new messages — debounced to avoid hammering during streaming
   const target = adapter.getObserveTarget();
   if (!target) return;
 
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   const observer = new MutationObserver(() => {
-    injectButtons(adapter);
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => injectButtons(adapter), 300);
   });
   observer.observe(target, { childList: true, subtree: true });
 }
@@ -29,6 +31,9 @@ function injectButtons(adapter: PlatformAdapter) {
 
     const anchor = adapter.getButtonAnchor(msg);
     if (!anchor) continue;
+
+    // Guard: don't inject if this exact anchor already has our button
+    if (anchor.container.querySelector(".acs-btn")) continue;
 
     const btn = createButton(adapter, msg);
     anchor.container.insertAdjacentElement(anchor.position, btn);

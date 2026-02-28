@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "One-click screenshot of AI chatbot conversations for easy sharing",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite build --watch",
     "build": "tsc --noEmit && vite build",
